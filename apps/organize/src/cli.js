@@ -1,6 +1,7 @@
 import { logger } from "./shared/logger.js";
 import { scan } from "./filesystem/scan.js";
 import { readMetadata } from "./metadata/read.js";
+import { resolveTitle } from "./resolver/title.js";
 
 const [_node, _script, input, ...options] = process.argv;
 
@@ -15,6 +16,7 @@ try {
   logger.info("Initializing Media Tools : Organize");
   await scan(ctx);
   await readMetadata(ctx);
+  await resolveTitle(ctx);
   console.dir(ctx.files, { depth: null });
 } catch (err) {
   logger.error(err.message);
