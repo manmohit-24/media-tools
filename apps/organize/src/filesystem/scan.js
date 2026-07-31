@@ -3,12 +3,14 @@ import path from "node:path";
 
 import { isMediaFile } from "./media.js";
 
-export async function scan(ctx) {
-  if (!ctx.input) throw new Error("Input directory is required.");
+export async function scan(input) {
+  if (!input.path) throw new Error("Directory is required.");
 
-  ctx.files = [];
+  const files = [];
 
-  await walkDirectory(ctx.input, ctx.files, ctx.options.recursive);
+  await walkDirectory(input.path, files, input.options.recursive);
+
+  return files;
 }
 
 async function walkDirectory(directory, files, recursive) {

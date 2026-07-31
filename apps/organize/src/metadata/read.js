@@ -1,13 +1,9 @@
 import { execute } from "../shared/execute.js";
 
-export async function readMetadata(ctx) {
-  for (const file of ctx.files) {
-    const { stdout } = await execute("mediainfo", ["--Output=JSON", file.path]);
-
-    const mediaInfo = JSON.parse(stdout);
-
-    file.metadata = extractMetadata(mediaInfo);
-  }
+export async function readMetadata(file) {
+  const { stdout } = await execute("mediainfo", ["--Output=JSON", file.path]);
+  const mediaInfo = JSON.parse(stdout);
+  file.metadata = extractMetadata(mediaInfo);
 }
 
 function extractMetadata(mediaInfo) {

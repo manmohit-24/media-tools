@@ -1,16 +1,14 @@
 import path from "node:path";
 
-export async function resolveTitle(ctx) {
-  for (const file of ctx.files) {
-    const source = file.metadata.title || path.parse(file.name).name;
-    const year = extractYear(source);
+export async function resolveTitle(file) {
+  const source = file.metadata.title || path.parse(file.name).name;
+  const year = extractYear(source);
 
-    file.query = {
-      title: cleanTitle(source, year),
-      year,
-      source: file.metadata.title ? "metadata" : "filename",
-    };
-  }
+  file.query = {
+    title: cleanTitle(source, year),
+    year,
+    source: file.metadata.title ? "metadata" : "filename",
+  };
 }
 
 function extractYear(text) {
