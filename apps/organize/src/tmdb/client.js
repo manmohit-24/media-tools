@@ -15,6 +15,21 @@ export async function searchMovie({ title, year }) {
   }));
 }
 
+export async function getMovie(id) {
+  const movie = await request(`/movie/${id}`);
+
+  return {
+    id: movie.id,
+    title: movie?.title,
+    originalTitle: movie?.original_title,
+    year: movie?.release_date ? Number(movie.release_date.slice(0, 4)) : null,
+    releaseDate: movie?.release_date,
+    overview: movie?.overview,
+    tagline: movie?.tagline,
+    poster: movie?.poster_path,
+  };
+}
+
 async function request(endpoint, params = {}) {
   const url = new URL(`${BASE_URL}${endpoint}`);
 
