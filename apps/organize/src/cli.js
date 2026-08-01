@@ -5,6 +5,7 @@ import { resolveTitle } from "./resolver/title.js";
 import { matchMovie } from "./tmdb/match.js";
 import { fetchMovieDetails } from "./tmdb/details.js";
 import { downloadPoster } from "./poster/download.js";
+import { addStandardMeta } from "./metadata/build.js";
 
 const [_node, _script, path, ...options] = process.argv;
 
@@ -25,7 +26,9 @@ try {
     await matchMovie(file);
     await fetchMovieDetails(file);
     await downloadPoster(file);
-    console.dir(file, { depth: 2 });
+    addStandardMeta(file);
+
+    console.dir(file, { depth: null });
   }
 } catch (err) {
   logger.error(err);

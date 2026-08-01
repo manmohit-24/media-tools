@@ -19,31 +19,29 @@ function extractMetadata(mediaInfo) {
 
   return {
     title: general?.Title ?? null,
-    cover: cover
-      ? {
-          exists: true,
-          name: cover.Title,
-        }
-      : {
-          exists: false,
-          name: null,
-        },
+    cover: cover ? { name: cover.Title } : null,
     video: video
       ? {
-          codec: video.Format,
+          format: video.Format,
           width: Number(video.Width),
           height: Number(video.Height),
         }
       : null,
 
     audio: audio.map((track) => ({
-      language: track.Language ?? null,
+      id: Number(track.ID),
+      language: track.Language,
       title: track.Title ?? null,
+      default: track.Default === "Yes",
+      forced: track.Forced === "Yes",
     })),
 
     subtitles: subtitles.map((track) => ({
-      language: track.Language ?? null,
+      id: Number(track.ID),
+      language: track.Language,
       title: track.Title ?? null,
+      default: track.Default === "Yes",
+      forced: track.Forced === "Yes",
     })),
   };
 }
