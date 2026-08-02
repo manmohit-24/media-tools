@@ -6,6 +6,7 @@ import { matchMovie } from "./tmdb/match.js";
 import { fetchMovieDetails } from "./tmdb/details.js";
 import { addStandardMeta } from "./metadata/build.js";
 import { updateMetadata } from "./update/index.js";
+import { renameFile } from "./filesystem/rename.js";
 
 const [_node, _script, path, ...options] = process.argv;
 
@@ -35,6 +36,7 @@ for (const file of files) {
     await fetchMovieDetails(file);
     addStandardMeta(file);
     await updateMetadata(file);
+    await renameFile(file);
   } catch (error) {
     logger.error("Error for ", file.name);
     logger.error(error);
