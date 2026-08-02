@@ -4,8 +4,7 @@
   "main": "index.js",
   "private": true,
   "scripts": {
-    "organize": "pnpm --filter organize start",
-    "shelf": "pnpm --filter shelf start"
+    "start": "node src/cli.js"
   },
   "devEngines": {
     "packageManager": {
@@ -13,6 +12,10 @@
       "version": "11.9.0",
       "onFail": "download"
     }
+  },
+  "dependencies": {
+    "kleur": "^4.1.5",
+    "ora": "^9.4.1"
   },
   "type": "module"
 }
