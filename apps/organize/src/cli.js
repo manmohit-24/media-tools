@@ -13,6 +13,8 @@ import { matchMovie } from "./tmdb/match.js";
 
 import { updateMetadata } from "./update/index.js";
 
+import { updateTimestamps } from "./timestamps/timestamps.js";
+
 const [_node, _script, path, ...options] = process.argv;
 
 const input = {
@@ -68,6 +70,9 @@ for (let i = 0; i < files.length; i++) {
     spinner.text = `Renaming file`;
     await renameFile(file);
 
+    spinner.text = `Updating Timestamps`;
+    await updateTimestamps(file);
+
     spinner.succeed(`${label} -> ${file.name}`);
   } catch (error) {
     spinner.fail(label);
@@ -77,3 +82,4 @@ for (let i = 0; i < files.length; i++) {
 
 logger.divider();
 logger.success("Completed");
+logger.info("Keep sorted with 'First Modified' for sort in release order");
