@@ -1,6 +1,7 @@
 import { getLanguageName } from "../shared/language.js";
 
 export function addStandardMeta(file) {
+  if (!file.movie) throw new Error(`No movie`);
   file.standard = {
     title: file.movie.title,
     comment: null,
@@ -29,7 +30,7 @@ function buildSubtitleTrack(track) {
   return {
     id: track.id,
     language: language,
-    name: buildSubtitleName(language, track.title),
+    name: buildSubtitleName(language, track),
     default: track.default,
     forced: track.forced,
   };
@@ -38,10 +39,10 @@ function buildSubtitleTrack(track) {
 export function normalizeLanguage(code) {
   return code?.toLowerCase().split("-")[0].trim();
 }
-
-function buildSubtitleName(language, title) {
+function buildSubtitleName(language, track) {
   const lang = getLanguageName(language);
 
-  if (!title) return lang;
-  return `${lang} (${title})`;
+  return `${lang} ${track.default ? "(Default) " : ""}${track.forced ? "(Forced)" : ""}`;
+
+  return lang;
 }
