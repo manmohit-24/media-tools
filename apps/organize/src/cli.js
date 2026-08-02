@@ -1,12 +1,18 @@
 import { logger } from "./shared/logger.js";
+import { createSpinner } from "./shared/spinner.js";
+
 import { scan } from "./filesystem/scan.js";
+import { renameFile } from "./filesystem/rename.js";
+
 import { readMetadata } from "./metadata/read.js";
+import { addStandardMeta } from "./metadata/build.js";
+
 import { resolveTitle } from "./resolver/title.js";
+
 import { matchMovie } from "./tmdb/match.js";
 import { fetchMovieDetails } from "./tmdb/details.js";
-import { addStandardMeta } from "./metadata/build.js";
+
 import { updateMetadata } from "./update/index.js";
-import { renameFile } from "./filesystem/rename.js";
 
 const [_node, _script, path, ...options] = process.argv;
 
@@ -17,30 +23,62 @@ const input = {
   },
 };
 
+logger.divider();
+logger.title("🎬 Media Tools");
+logger.text("Mode      : Organize");
+logger.text(`Directory : ${input.path}`);
+logger.text(`Recursive : ${input.options.recursive}`);
+logger.divider();
+
 let files;
 
+const scanSpinner = createSpinner("Scanning library...").start();
+
 try {
-  logger.info("Initializing Media Tools : Organize");
   files = await scan(input);
+
+  scanSpinner.succeed(`Found ${files.length} media files`);
 } catch (err) {
-  logger.error("Error scanning directory");
-  logger.error(err);
+  scanSpinner.fail("Failed to scan library");
+  logger.error(err.message);
   process.exit(1);
 }
 
-for (const file of files) {
+logger.divider();
+
+for (let i = 0; i < files.length; i++) {
+  const file = files[i];
+  const label = `[${i + 1}/${files.length}] ${file.name}`;
+  const spinner = createSpinner(label).start();
+
   try {
+    spinner.text = `Reading metadata`;
     await readMetadata(file);
+
+    spinner.text = `Resolving title`;
     await resolveTitle(file);
+
+    spinner.text = `Searching TMDb`;
     await matchMovie(file);
+
+    spinner.text = `Fetching movie details`;
     await fetchMovieDetails(file);
+
+    spinner.text = `Building metadata`;
     addStandardMeta(file);
+
+    spinner.text = `Updating media`;
     await updateMetadata(file);
+
+    spinner.text = `Renaming file`;
     await renameFile(file);
+
+    spinner.succeed(label);
   } catch (error) {
-    logger.error("Error for ", file.name);
-    logger.error(error);
-  } finally {
-    console.dir(file, { depth: 3 });
+    spinner.fail(label);
+    logger.muted(`    ${error.message}`);
   }
 }
+
+logger.divider();
+logger.success("Completed");

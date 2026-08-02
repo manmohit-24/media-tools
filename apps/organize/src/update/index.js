@@ -2,7 +2,6 @@ import * as mkv from "./mkv.js";
 import * as mp4 from "./mp4.js";
 
 export async function updateMetadata(file) {
-  console.log("Doing :", file.name);
   switch (file.extension) {
     case ".mkv":
       return mkv.updateMetadata(file);
