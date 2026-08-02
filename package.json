@@ -4,7 +4,7 @@
   "main": "index.js",
   "private": true,
   "scripts": {
-    "start": "node src/cli.js"
+    "organize": "node src/cli.js"
   },
   "devEngines": {
     "packageManager": {
@@ -16,6 +16,9 @@
   "dependencies": {
     "kleur": "^4.1.5",
     "ora": "^9.4.1"
+  },
+  "bin": {
+    "media-tools": "./src/cli.js"
   },
   "type": "module"
 }

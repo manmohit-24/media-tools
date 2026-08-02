@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { logger } from "./shared/logger.js";
 import { createSpinner } from "./shared/spinner.js";
 
