@@ -3,7 +3,8 @@ import { rename } from "node:fs/promises";
 import { access } from "node:fs/promises";
 
 export async function renameFile(file) {
-  const baseName = `${file.movie.title} (${file.movie.year})`;
+  const { name: baseName } = file.standard;
+
   const extension = path.extname(file.path);
   const dir = path.dirname(file.path);
 

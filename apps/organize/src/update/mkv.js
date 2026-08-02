@@ -6,16 +6,20 @@ import { execute } from "../shared/execute.js";
 import { downloadPoster } from "../tmdb/poster.js";
 
 export async function updateMetadata(file) {
-  const args = buildEditArguments(file.standard);
+  const standard = file.standard;
+  const args = [];
 
+  buildEditArguments(args, standard);
   let temp = null;
 
-  if (file.movie.poster) {
-    const poster = await downloadPoster(file.movie.poster);
-    temp = path.join(tmpdir(), "cover.jpg");
+  if (standard.cover) {
+    const { filename, source } = standard.cover;
+    const poster = await downloadPoster(source);
+
+    temp = path.join(tmpdir(), filename);
 
     await writeFile(temp, poster.data);
-    addPoster(args, temp);
+    addPoster(args, filename, temp);
   }
 
   try {
@@ -27,19 +31,18 @@ export async function updateMetadata(file) {
   }
 }
 
-function buildEditArguments(metadata) {
-  const args = [];
-
-  addGeneralMetadata(args, metadata);
-  addAudioTracks(args, metadata.audio);
-  addSubtitleTracks(args, metadata.subtitles);
+function buildEditArguments(args, standard) {
+  addGeneralMetadata(args, standard);
+  addAudioTracks(args, standard.audio);
+  addSubtitleTracks(args, standard.subtitles);
   removeAttachments(args);
-  return args;
 }
 
-function addGeneralMetadata(args, metadata) {
-  args.push("--edit", "info", "--set", `title=${metadata.title}`);
+function addGeneralMetadata(args, standard) {
+  args.push("--edit", "info", "--set", `title=${standard.title}`);
   args.push("--tags", "all:");
+  if (standard.release_date)
+    args.push("--edit", "info", "--set", `date=${standard.release_date}`);
 }
 
 function addAudioTracks(args, tracks) {
@@ -63,10 +66,10 @@ function removeAttachments(args) {
   );
 }
 
-function addPoster(args, tempPath) {
+function addPoster(args, filename, tempPath) {
   args.push(
     "--attachment-name",
-    "cover.jpg",
+    filename ?? "cover.jpg",
     "--attachment-mime-type",
     "image/jpeg",
     "--add-attachment",

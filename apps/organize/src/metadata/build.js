@@ -1,16 +1,18 @@
 import { getLanguageName } from "../shared/language.js";
 
 export function addStandardMeta(file) {
-  if (!file.movie) throw new Error(`No movie`);
+  if (!file.match) throw new Error(`No Movie found`);
+
   file.standard = {
-    title: file.movie.title,
-    comment: null,
+    title: file.match.title,
     cover: {
       filename: "cover.jpg",
-      source: file.movie.poster,
+      source: file.match.poster,
     },
     audio: file.metadata.audio.map(buildAudioTrack),
     subtitles: file.metadata.subtitles.map(buildSubtitleTrack),
+    release_date: file.match.release_date,
+    name: `${file.match.title} (${file.match.release_date.slice(0, 4)})`,
   };
 }
 
@@ -36,9 +38,10 @@ function buildSubtitleTrack(track) {
   };
 }
 
-export function normalizeLanguage(code) {
+function normalizeLanguage(code) {
   return code?.toLowerCase().split("-")[0].trim();
 }
+
 function buildSubtitleName(language, track) {
   const lang = getLanguageName(language);
 

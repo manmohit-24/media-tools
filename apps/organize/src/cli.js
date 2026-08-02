@@ -10,7 +10,6 @@ import { addStandardMeta } from "./metadata/build.js";
 import { resolveTitle } from "./resolver/title.js";
 
 import { matchMovie } from "./tmdb/match.js";
-import { fetchMovieDetails } from "./tmdb/details.js";
 
 import { updateMetadata } from "./update/index.js";
 
@@ -24,7 +23,7 @@ const input = {
 };
 
 logger.divider();
-logger.title("🎬 Media Tools");
+logger.title("Media Tools");
 logger.text("Mode      : Organize");
 logger.text(`Directory : ${input.path}`);
 logger.text(`Recursive : ${input.options.recursive}`);
@@ -36,7 +35,6 @@ const scanSpinner = createSpinner("Scanning library...").start();
 
 try {
   files = await scan(input);
-
   scanSpinner.succeed(`Found ${files.length} media files`);
 } catch (err) {
   scanSpinner.fail("Failed to scan library");
@@ -61,9 +59,6 @@ for (let i = 0; i < files.length; i++) {
     spinner.text = `Searching TMDb`;
     await matchMovie(file);
 
-    spinner.text = `Fetching movie details`;
-    await fetchMovieDetails(file);
-
     spinner.text = `Building metadata`;
     addStandardMeta(file);
 
@@ -73,7 +68,7 @@ for (let i = 0; i < files.length; i++) {
     spinner.text = `Renaming file`;
     await renameFile(file);
 
-    spinner.succeed(label);
+    spinner.succeed(`${label} -> ${file.name}`);
   } catch (error) {
     spinner.fail(label);
     logger.muted(`    ${error.message}`);

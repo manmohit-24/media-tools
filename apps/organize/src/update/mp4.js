@@ -1,3 +1,3 @@
 export async function updateMetadata(file) {
-  console.log("MP4 is not supported yet");
+  throw new Error("MP4 is not supported yet");
 }
