@@ -3,31 +3,26 @@ import { rename } from "node:fs/promises";
 import { access } from "node:fs/promises";
 
 export async function renameFile(file) {
-  const { destination, filename } = await getAvailablePath(
-    path.dirname(file.path),
-    `${file.movie.title} (${file.movie.year})`,
-    path.extname(file.path),
-  );
+  const baseName = `${file.movie.title} (${file.movie.year})`;
+  const extension = path.extname(file.path);
+  const dir = path.dirname(file.path);
 
-  if (destination === file.path) return;
-  await rename(file.path, destination);
-
-  file.path = destination;
-  file.name = filename;
-}
-
-export async function getAvailablePath(dir, baseName, extension) {
   let filename = `${baseName}${extension}`;
   let destination = path.join(dir, filename);
   let index = 1;
 
   while (await exists(destination)) {
+    if (destination === file.path) return;
+
     filename = `${baseName} (${index})${extension}`;
     destination = path.join(dir, filename);
     index++;
   }
 
-  return { destination, filename };
+  await rename(file.path, destination);
+
+  file.path = destination;
+  file.name = filename;
 }
 
 async function exists(file) {
