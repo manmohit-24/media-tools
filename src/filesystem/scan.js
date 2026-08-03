@@ -1,16 +1,38 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 
-import { isMediaFile } from "./media.js";
+const SUPPORTED_EXTENSIONS = new Set([".mkv", ".mp4"]);
+
+function isSupportedMedia(extension) {
+  return SUPPORTED_EXTENSIONS.has(extension.toLowerCase());
+}
 
 export async function scan(input) {
-  if (!input.path) throw new Error("Directory is required.");
+  if (!input.path) throw new Error("Path is required.");
 
   const files = [];
+  const stat = await fs.stat(input.path);
+  if (stat.isFile()) {
+    const extension = path.extname(input.path);
 
-  await walkDirectory(input.path, files, input.options.recursive);
+    if (!isSupportedMedia(extension))
+      throw new Error("Not a supported media file.");
 
-  return files;
+    files.push({
+      path: input.path,
+      name: path.basename(input.path),
+      extension,
+    });
+
+    return files;
+  }
+
+  if (stat.isDirectory()) {
+    await walkDirectory(input.path, files, input.options.recursive);
+    return files;
+  }
+
+  throw new Error("Invalid path.");
 }
 
 async function walkDirectory(directory, files, recursive) {
@@ -30,7 +52,7 @@ async function walkDirectory(directory, files, recursive) {
 
     const extension = path.extname(entry.name);
 
-    if (!isMediaFile(extension)) continue;
+    if (!isSupportedMedia(entry)) continue;
 
     files.push({
       path: fullPath,

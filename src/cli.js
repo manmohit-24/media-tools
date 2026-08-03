@@ -29,7 +29,7 @@ const input = {
 logger.divider();
 logger.title("Media Tools");
 logger.text("Mode      : Organize");
-logger.text(`Directory : ${input.path}`);
+logger.text(`Path      : ${input.path}`);
 logger.text(`Recursive : ${input.options.recursive}`);
 logger.divider();
 
