@@ -13,7 +13,7 @@ export async function renameFile(file) {
   let index = 1;
 
   while (await exists(destination)) {
-    if (destination === file.path) return;
+    if (path.resolve(destination) === path.resolve(file.path)) return;
 
     filename = `${baseName} (${index})${extension}`;
     destination = path.join(dir, filename);
