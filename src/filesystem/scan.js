@@ -12,6 +12,7 @@ export async function scan(input) {
 
   const files = [];
   const stat = await fs.stat(input.path);
+
   if (stat.isFile()) {
     const extension = path.extname(input.path);
 
@@ -51,8 +52,7 @@ async function walkDirectory(directory, files, recursive) {
     if (!entry.isFile()) continue;
 
     const extension = path.extname(entry.name);
-
-    if (!isSupportedMedia(entry)) continue;
+    if (!isSupportedMedia(extension)) continue;
 
     files.push({
       path: fullPath,
