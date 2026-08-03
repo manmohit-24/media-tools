@@ -12,7 +12,7 @@ export function addStandardMeta(file) {
     audio: file.metadata.audio.map(buildAudioTrack),
     subtitles: file.metadata.subtitles.map(buildSubtitleTrack),
     release_date: file.match.release_date,
-    name: `${file.match.title} (${file.match.release_date.slice(0, 4)})`,
+    name: buildName(file.match.title, file.match.release_date),
   };
 }
 
@@ -48,4 +48,12 @@ function buildSubtitleName(language, track) {
   return `${lang} ${track.default ? "(Default) " : ""}${track.forced ? "(Forced)" : ""}`;
 
   return lang;
+}
+
+const INVALID_FILENAME = /[<>:"/\\|?*\x00-\x1F]/g;
+
+function buildName(title, release_date) {
+  const name = title.replace(INVALID_FILENAME, "").replace(/\s+/g, " ").trim();
+  const year = release_date.slice(0, 4);
+  return `${name} (${year})`;
 }
