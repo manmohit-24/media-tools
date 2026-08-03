@@ -23,14 +23,16 @@ const input = {
   path,
   options: {
     recursive: options.includes("-r") || options.includes("--recursive"),
+    interactive: options.includes("-i") || options.includes("--interactive"),
   },
 };
 
 logger.divider();
 logger.title("Media Tools");
-logger.text("Mode      : Organize");
-logger.text(`Path      : ${input.path}`);
-logger.text(`Recursive : ${input.options.recursive}`);
+logger.text("Mode        : Organize");
+logger.text(`Path        : ${input.path}`);
+logger.text(`Recursive   : ${input.options.recursive}`);
+logger.text(`Interactive : ${input.options.interactive}`);
 logger.divider();
 
 let files;
@@ -60,8 +62,8 @@ for (let i = 0; i < files.length; i++) {
     spinner.text = `Resolving title`;
     await resolveTitle(file);
 
-    spinner.text = `Searching TMDb`;
-    await matchMovie(file);
+    spinner.text = `Finding TMDb match`;
+    await matchMovie(file, input.options.interactive);
 
     spinner.text = `Building metadata`;
     addStandardMeta(file);
