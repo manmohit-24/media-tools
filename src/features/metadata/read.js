@@ -1,6 +1,8 @@
 import { execute } from "../../shared/execute.js";
+import { spinner } from "../../app/spinner.js";
 
 export async function readMetadata(file) {
+  spinner.step("Reading Metadata");
   const { stdout } = await execute("mediainfo", ["--Output=JSON", file.path]);
   const mediaInfo = JSON.parse(stdout);
   file.metadata = extractMetadata(mediaInfo);

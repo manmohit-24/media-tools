@@ -3,10 +3,13 @@ import path from "node:path";
 import { writeFile, unlink } from "node:fs/promises";
 
 import { downloadPoster } from "../../providers/media/index.js";
+import { spinner } from "../../app/spinner.js";
 
 import * as mkv from "./mkv.js";
 
 export async function updateMetadata(file) {
+  spinner.step("Updating Media");
+
   let cover = null;
   let tempPath = null;
 

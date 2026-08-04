@@ -2,7 +2,10 @@ import path from "node:path";
 import { rename } from "node:fs/promises";
 import { access } from "node:fs/promises";
 
+import { spinner } from "../../app/spinner.js";
+
 export async function renameFile(file) {
+  spinner.step("Renaming file");
   const { name: baseName } = file.standard;
 
   const extension = path.extname(file.path);

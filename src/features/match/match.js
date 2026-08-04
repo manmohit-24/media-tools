@@ -1,14 +1,17 @@
 import { select } from "@inquirer/prompts";
+
 import { searchMovie } from "../../providers/media/index.js";
+import { spinner } from "../../app/spinner.js";
 
 export async function matchMovie(file, interactive = false) {
+  spinner.step("Finding a Match");
   const matches = await searchMovie(file.query);
 
   if (matches.length === 0) throw new Error("No match found");
 
   file.match =
     interactive && matches.length > 1
-      ? await chooseMovie(matches, file.name)
+      ? await spinner.suspend(() => chooseMovie(matches, file.name))
       : matches[0];
 }
 
