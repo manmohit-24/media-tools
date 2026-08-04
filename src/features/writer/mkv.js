@@ -1,41 +1,25 @@
-import { writeFile, unlink } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import path from "node:path";
-
 import { execute } from "../../shared/execute.js";
-import { downloadPoster } from "../../providers/media/index.js";
 
-export async function updateMetadata(file) {
-  const standard = file.standard;
-  const args = [];
-
-  buildEditArguments(args, standard);
-  let temp = null;
-
-  if (standard.cover) {
-    const { filename, source } = standard.cover;
-    const poster = await downloadPoster(source);
-
-    temp = path.join(tmpdir(), filename);
-
-    await writeFile(temp, poster.data);
-    addPoster(args, filename, temp);
-  }
+export async function updateMetadata(standard, cover) {
+  const args = buildEditArguments(standard, cover);
 
   try {
     await execute("mkvpropedit", [file.path, ...args]);
   } catch (error) {
     if (error.code > 1) throw error; // mkvpropedit throws error code 1 for warnings
-  } finally {
-    if (temp) await unlink(temp);
   }
 }
 
-function buildEditArguments(args, standard) {
+function buildEditArguments(standard, cover) {
+  const args = [];
+
   addGeneralMetadata(args, standard);
   addAudioTracks(args, standard.audio);
   addSubtitleTracks(args, standard.subtitles);
   removeAttachments(args);
+  addPoster(args, cover);
+
+  return args;
 }
 
 function addGeneralMetadata(args, standard) {
@@ -66,13 +50,15 @@ function removeAttachments(args) {
   );
 }
 
-function addPoster(args, filename, tempPath) {
+function addPoster(args, cover) {
+  if (!cover) return;
+
   args.push(
     "--attachment-name",
-    filename ?? "cover.jpg",
+    cover.filename ?? "cover.jpg",
     "--attachment-mime-type",
     "image/jpeg",
     "--add-attachment",
-    tempPath,
+    cover.tempPath,
   );
 }
