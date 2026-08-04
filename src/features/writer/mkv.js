@@ -1,10 +1,10 @@
 import { execute } from "../../shared/execute.js";
 
-export async function updateMetadata(standard, cover) {
+export async function updateMetadata(path, standard, cover) {
   const args = buildEditArguments(standard, cover);
 
   try {
-    await execute("mkvpropedit", [file.path, ...args]);
+    await execute("mkvpropedit", [path, ...args]);
   } catch (error) {
     if (error.code > 1) throw error; // mkvpropedit throws error code 1 for warnings
   }

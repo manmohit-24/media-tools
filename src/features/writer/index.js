@@ -27,7 +27,7 @@ export async function updateMetadata(file) {
   try {
     switch (file.extension) {
       case ".mkv":
-        mkv.updateMetadata(file.standard, cover);
+        await mkv.updateMetadata(file.path, file.standard, cover);
         break;
       default:
         throw new Error(`Unsupported format: ${file.extension}`);
