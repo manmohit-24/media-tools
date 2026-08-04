@@ -1,6 +1,6 @@
-import { getLanguageName } from "../shared/language.js";
+import { getLanguageName } from "../../shared/language.js";
 
-export function addStandardMeta(file) {
+export async function addStandardMeta(file) {
   if (!file.match) throw new Error(`No Movie found`);
 
   file.standard = {

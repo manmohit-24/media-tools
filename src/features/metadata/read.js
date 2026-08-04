@@ -1,4 +1,4 @@
-import { execute } from "../shared/execute.js";
+import { execute } from "../../shared/execute.js";
 
 export async function readMetadata(file) {
   const { stdout } = await execute("mediainfo", ["--Output=JSON", file.path]);

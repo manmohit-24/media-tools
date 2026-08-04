@@ -1,7 +1,23 @@
-import { env } from "../config/env.js";
-const BASE_URL = "https://api.themoviedb.org/3";
+import { env } from "../../app/config.js";
 
-export async function request(endpoint, params = {}) {
+const BASE_URL = "https://api.themoviedb.org/3";
+const RETRIES = 3;
+
+export async function searchMovie({ title, year }) {
+  const data = await request("/search/movie", {
+    query: title,
+    year,
+  });
+
+  return data.results.map((movie) => ({
+    id: movie?.id,
+    title: movie?.title,
+    release_date: movie.release_date || null,
+    poster: movie?.poster_path,
+  }));
+}
+
+async function request(endpoint, params = {}) {
   const url = new URL(`${BASE_URL}${endpoint}`);
 
   url.searchParams.set("api_key", env.tmdbApiKey);
@@ -12,7 +28,7 @@ export async function request(endpoint, params = {}) {
 
   let lastError;
 
-  for (let attempt = 1; attempt <= 3; attempt++) {
+  for (let attempt = 1; attempt <= RETRIES; attempt++) {
     try {
       const signal = AbortSignal.timeout(10_000);
 

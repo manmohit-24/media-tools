@@ -1,12 +1,10 @@
-import { request } from "./request.js";
 import { select } from "@inquirer/prompts";
+import { searchMovie } from "../../providers/media/index.js";
 
 export async function matchMovie(file, interactive = false) {
   const matches = await searchMovie(file.query);
 
-  if (matches.length === 0) {
-    throw new Error("No match found");
-  }
+  if (matches.length === 0) throw new Error("No match found");
 
   file.match =
     interactive && matches.length > 1
@@ -24,18 +22,4 @@ export async function chooseMovie(matches, name) {
   });
 
   return choice;
-}
-
-async function searchMovie({ title, year }) {
-  const data = await request("/search/movie", {
-    query: title,
-    year,
-  });
-
-  return data.results.map((movie) => ({
-    id: movie?.id,
-    title: movie?.title,
-    release_date: movie.release_date || null,
-    poster: movie?.poster_path,
-  }));
 }

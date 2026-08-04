@@ -2,8 +2,8 @@ import { writeFile, unlink } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
-import { execute } from "../shared/execute.js";
-import { downloadPoster } from "../tmdb/poster.js";
+import { execute } from "../../shared/execute.js";
+import { downloadPoster } from "../../providers/media/index.js";
 
 export async function updateMetadata(file) {
   const standard = file.standard;

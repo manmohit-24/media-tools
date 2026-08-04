@@ -3,19 +3,19 @@
 import { logger } from "./shared/logger.js";
 import { createSpinner } from "./shared/spinner.js";
 
-import { scan } from "./filesystem/scan.js";
-import { renameFile } from "./filesystem/rename.js";
+import { scan } from "./features/scan/scan.js";
+import { renameFile } from "./features/rename/rename.js";
 
-import { readMetadata } from "./metadata/read.js";
-import { addStandardMeta } from "./metadata/build.js";
+import { readMetadata } from "./features/metadata/read.js";
+import { addStandardMeta } from "./features/standardize/standardize.js";
 
-import { resolveTitle } from "./resolver/title.js";
+import { resolveTitle } from "./features/resolve/title.js";
 
-import { matchMovie } from "./tmdb/match.js";
+import { matchMovie } from "./features/match/match.js";
 
-import { updateMetadata } from "./update/index.js";
+import { updateMetadata } from "./features/writer/index.js";
 
-import { updateTimestamps } from "./timestamps/timestamps.js";
+import { updateTimestamps } from "./features/timestamps/timestamps.js";
 
 const [_node, _script, path, ...options] = process.argv;
 
@@ -62,11 +62,11 @@ for (let i = 0; i < files.length; i++) {
     spinner.text = `Resolving title`;
     await resolveTitle(file);
 
-    spinner.text = `Finding TMDb match`;
+    spinner.text = `Finding a match`;
     await matchMovie(file, input.options.interactive);
 
     spinner.text = `Building metadata`;
-    addStandardMeta(file);
+    await addStandardMeta(file);
 
     spinner.text = `Updating media`;
     await updateMetadata(file);

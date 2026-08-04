@@ -4,7 +4,7 @@
   "main": "index.js",
   "private": true,
   "scripts": {
-    "organize": "node src/cli.js"
+    "start": "node src/cli.js"
   },
   "devEngines": {
     "packageManager": {
