@@ -7,22 +7,17 @@ import {
   extractYear,
 } from "./cleaners.js";
 
-export async function resolveTitle(file) {
-  const title = file.metadata.title;
-  const name = path.parse(file.name).name;
+export function resolveTitle(title, name) {
+  const year = extractYear(title) ?? extractYear(name);
 
-  const source = title || name;
-
-  const year = extractYear(source) ?? extractYear(name);
-
-  let resolved = source;
+  let resolved = title ?? name;
 
   resolved = removeWebsitePrefix(resolved);
   resolved = normalizeSeparators(resolved);
   resolved = truncateReleaseInfo(resolved, year);
   resolved = cleanTitle(resolved);
 
-  file.query = {
+  return {
     title: resolved,
     year,
   };

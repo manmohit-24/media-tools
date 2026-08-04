@@ -9,9 +9,7 @@ import { renameFile } from "./features/rename/rename.js";
 import { readMetadata } from "./features/metadata/read.js";
 import { addStandardMeta } from "./features/standardize/standardize.js";
 
-import { resolveTitle } from "./features/resolve/title.js";
-
-import { matchMovie } from "./features/match/match.js";
+import { interactiveMatchMovie } from "./features/match/match.js";
 
 import { updateMetadata } from "./features/writer/index.js";
 
@@ -58,9 +56,7 @@ for (let i = 0; i < files.length; i++) {
   try {
     await readMetadata(file);
 
-    await resolveTitle(file);
-
-    await matchMovie(file, input.options.interactive);
+    await interactiveMatchMovie(file);
 
     await addStandardMeta(file);
 
@@ -74,10 +70,10 @@ for (let i = 0; i < files.length; i++) {
   } catch (error) {
     logger.error(label);
     logger.muted(`    ${error.message}`);
+    logger.error(error);
   }
 }
 
-spinner.stop();
 logger.divider();
-logger.success("Completed");
+spinner.success("Completed");
 logger.info("Keep sorted with 'First Modified' for sort in release order");
