@@ -3,34 +3,64 @@
 import { logger } from "./shared/logger.js";
 import { spinner } from "./app/spinner.js";
 
+import { MODES, FLAGS } from "./app/constants.js";
+
 import { scan } from "./features/scan/scan.js";
-import { renameFile } from "./features/rename/rename.js";
 
-import { readMetadata } from "./features/metadata/read.js";
-import { addStandardMeta } from "./features/standardize/standardize.js";
+import { runPipeline } from "./pipeline/index.js";
 
-import { interactiveMatchMovie } from "./features/match/match.js";
+const args = process.argv.slice(2);
 
-import { updateMetadata } from "./features/writer/index.js";
-
-import { updateTimestamps } from "./features/timestamps/timestamps.js";
-
-const [_node, _script, path, ...options] = process.argv;
-
-const input = {
-  path,
-  options: {
-    recursive: options.includes("-r") || options.includes("--recursive"),
-    interactive: options.includes("-i") || options.includes("--interactive"),
-  },
+const config = {
+  mode: null,
+  path: null,
+  recursive: false,
+  auto: false,
 };
+
+for (const arg of args) {
+  if (arg.startsWith("-")) {
+    const flag = FLAGS[arg];
+
+    if (!flag) {
+      logger.error(`'${arg}' is not a valid flag`);
+      process.exit(1);
+    }
+
+    config[flag] = true;
+    continue;
+  }
+
+  if (!config.mode) {
+    if (!MODES[arg]) {
+      logger.error(`'${arg}' is not a valid mode`);
+      process.exit(1);
+    }
+
+    config.mode = arg;
+    continue;
+  }
+
+  if (!config.path) {
+    config.path = arg;
+    continue;
+  }
+
+  logger.error(`Unexpected argument: '${arg}'`);
+  process.exit(1);
+}
+
+if (!config.path) {
+  logger.error("Path is required.");
+  process.exit(1);
+}
 
 logger.divider();
 logger.title("Media Tools");
-logger.text("Mode        : Organize");
-logger.text(`Path        : ${input.path}`);
-logger.text(`Recursive   : ${input.options.recursive}`);
-logger.text(`Interactive : ${input.options.interactive}`);
+logger.text(`Mode             : ${config.mode}`);
+logger.text(`Path             : ${config.path}`);
+logger.text(`Recursive        : ${config.recursive}`);
+logger.text(`Auto-Selection   : ${config.auto}`);
 logger.divider();
 
 let files;
@@ -39,7 +69,9 @@ spinner.start("");
 
 try {
   spinner.step("Scanning Files");
-  files = await scan(input);
+
+  files = await scan(config.path, config.recursive);
+
   logger.success(`Found ${files.length} media files`);
 } catch (err) {
   spinner.fail("Failed to scan library");
@@ -49,30 +81,7 @@ try {
 
 logger.divider();
 
-for (let i = 0; i < files.length; i++) {
-  const file = files[i];
-  const label = `[${i + 1}/${files.length}] ${file.name}`;
-  spinner.step(label);
-  try {
-    await readMetadata(file);
-
-    await interactiveMatchMovie(file);
-
-    await addStandardMeta(file);
-
-    await updateMetadata(file);
-
-    await renameFile(file);
-
-    await updateTimestamps(file);
-
-    logger.success(`${label} -> ${file.name}`);
-  } catch (error) {
-    logger.error(label);
-    logger.muted(`    ${error.message}`);
-    logger.error(error);
-  }
-}
+await runPipeline(files, config);
 
 logger.divider();
 spinner.success("Completed");
