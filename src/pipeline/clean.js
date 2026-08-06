@@ -1,5 +1,7 @@
 import { wrap } from "./wrap.js";
 
+import { shutdown } from "../app/shutdown.js";
+
 import { renameFile } from "../features/rename/rename.js";
 
 import { readMetadata } from "../features/metadata/read.js";
@@ -25,11 +27,15 @@ export async function clean(files, config) {
 
       await addStandardMeta(file);
 
-      await updateMetadata(file);
+      await shutdown.critical(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 5000));
 
-      await renameFile(file);
+        await updateMetadata(file);
 
-      await updateTimestamps(file);
+        await renameFile(file);
+
+        await updateTimestamps(file);
+      });
     });
   }
 }

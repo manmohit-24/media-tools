@@ -1,5 +1,7 @@
 import { wrap } from "./wrap.js";
 
+import { shutdown } from "../app/shutdown.js";
+
 import { renameFile } from "../features/rename/rename.js";
 
 import { readMetadata } from "../features/metadata/read.js";
@@ -21,11 +23,13 @@ export async function guided(files, config) {
 
       await addStandardMeta(file);
 
-      await updateMetadata(file);
+      await shutdown.critical(async () => {
+        await updateMetadata(file);
 
-      await renameFile(file);
+        await renameFile(file);
 
-      await updateTimestamps(file);
+        await updateTimestamps(file);
+      });
     });
   }
 }

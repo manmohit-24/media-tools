@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import "./app/shutdown.js";
 
 import { logger } from "./shared/logger.js";
 import { spinner } from "./app/spinner.js";
